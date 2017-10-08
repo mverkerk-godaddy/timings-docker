@@ -1,0 +1,44 @@
+version: '2'
+
+services:
+
+  elasticsearch:
+    build: elasticsearch/
+    container_name: elasticsearch
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/logs:/var/log/elasticsearch
+      - ./elasticsearch/data:/var/lib/elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+
+  kibana:
+    build: kibana/
+    container_name: kibana
+    volumes:
+      - ./kibana/config:/usr/share/kibana/config
+      - ./kibana/logs:/var/log/kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  timings:
+    # image: timings:latest
+    build: timings/
+    container_name: timings
+    volumes:
+      - ./timings/config/.config.js:/src/.config.js
+      - ./timings/logs:/src/logs
+      - ./timings/wait-for-it.sh:/src/wait-for-it.sh
+    ports:
+      - "80:80"
+    environment:
+      NODE_ENV: "production"
+    depends_on:
+      - elasticsearch
+      - kibana
+    command: ['./wait-for-it.sh', 'elasticsearch:9200', '-t', '30', '--strict', '--', 'node', './server.js', '-e', 'prod', '-f', 'elasticsearch', '-k', '${HOSTNAME}', '-d']
