@@ -12,7 +12,7 @@ Rcommendations:
 
 - Min. 8GB memory
 
-### 1. Clone this repo
+### Step 1. Clone this repo
 
 Clone this repo to a folder of your choice:
 
@@ -24,7 +24,7 @@ Cloning into 'timings-docker'...
 $ cd timings-docker
 ```
 
-### 2. Run docker-compose
+### Step 2. Run docker-compose
 
 You can start up the multi-container environments like this:
 
@@ -40,7 +40,7 @@ Starting timings ... done
 ...
 ```
 
-### 3. Test the apps
+### Step 3. Test the apps
 
 After the containers have started, you can test the apps by browsing to the following:
 
@@ -50,13 +50,13 @@ After the containers have started, you can test the apps by browsing to the foll
 |ElasticSearch|http://your_server:9200|
 |Kibana|http://your_server:5601|
 
-## Import Kibana assets
+### Step 4. Import Kibana assets
 
 **IMPORTANT:** To add Kibana assets, run the `import.py` script from (a) the docker host or (b) **inside** the elasticsearch container! This script will add dashboards, visualizations and index-patters for Kibana. It will even set the default index so you don't have to worry about anything!
 
 Follow these steps:
 
-### From the docker host
+## From the docker host
 
 If you want to run the script from the docker host (needs `python` and the `requests` module to be installed):
 
@@ -72,7 +72,7 @@ PASS -  - job: import [index-pattern] - item: cicd-perf-errorlog
 ...
 ```
 
-### From inside the elasticsearch container
+## From inside the elasticsearch container
 
 If you want to run the python script inside the elasticsearch container:
 

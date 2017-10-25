@@ -14,8 +14,6 @@ services:
       - "9300:9300"
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - elk
 
   kibana:
     build: kibana/
@@ -25,8 +23,6 @@ services:
       - ./kibana/logs:/var/log/kibana
     ports:
       - "5601:5601"
-    networks:
-      - elk
     depends_on:
       - elasticsearch
 
