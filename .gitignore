@@ -4,6 +4,4 @@
 # Build artifacts
 /build
 
-/elasticsearch/data
-/kibana/data
 /timings/logs
