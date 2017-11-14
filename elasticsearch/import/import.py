@@ -14,26 +14,39 @@ PARSER = argparse.ArgumentParser()
 
 # Common arguments
 PARSER.add_argument(
-    '-a', '--apihost', action='store', default='localhost',
+    '--apihost', action='store', default='localhost',
     help='host/ip address of the timings server (default=localhost)')
 PARSER.add_argument(
-    '-b', '--apiport', action='store', default='80',
+    '--apiport', action='store', default='80',
     help='host/ip address of the timings server (default=80)')
 PARSER.add_argument(
-    '-f', '--eshost', action='store', default='localhost',
+    '--esprotocol', action='store', default='http',
+    help='The scheme used by the elasticsearch server (default=http)')
+PARSER.add_argument(
+    '--eshost', action='store', default='localhost',
     help='host/ip address of the elasticsearch server (default=localhost)')
 PARSER.add_argument(
-    '-g', '--esport', action='store', default='9200',
+    '--esport', action='store', default='9200',
     help='port of the elasticsearch server (default=9200)')
 PARSER.add_argument(
-    '-i', '--kbindex', action='store', default='.kibana',
+    '--esuser', action='store',
+    help='The username for elasticsearch Basic auth')
+PARSER.add_argument(
+    '--espasswd', action='store',
+    help='The password for elasticsearch Basic auth')
+PARSER.add_argument(
+    '--kbindex', action='store', default='.kibana',
     help='the kibana index (default=.kibana)')
 PARSER.add_argument(
-    '-k', '--kbhost', action='store', default='localhost',
+    '--kbhost', action='store', default='localhost',
     help='host/ip address of the kibana server (default=localhost)')
 PARSER.add_argument(
-    '-l', '--kbport', action='store', default='5601',
+    '--kbport', action='store', default='5601',
     help='port of the kibana server (default=5601)')
+PARSER.add_argument(
+    '--replace', action='store',
+    help='replace `TIMINGS` with this string')
+
 
 OPTIONS = PARSER.parse_args()
 
@@ -41,20 +54,26 @@ if not len(sys.argv) > 1:
     print(">>> You did not provide any or all of the arguments - " +
           "defaults will be used!")
 
-IMPORT_JSON = json.load(open(os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), 'kibana_items.json')))
+IMPORT_FILE = open(os.path.join(os.path.abspath(
+    os.path.dirname(__file__)), 'kibana_items.json')).read()
+
+if OPTIONS.replace:
+    IMPORT_FILE = IMPORT_FILE.replace("TIMINGS", OPTIONS.replace.upper())
+
+IMPORT_JSON = json.loads(IMPORT_FILE)
 
 TEMPLATE_JSON = json.load(
     open(os.path.join(os.path.abspath(
         os.path.dirname(__file__)
-        ), 'cicd_template.json')))
+    ), 'cicd_template.json')))
 
 PERF_JSON = json.load(
     open(os.path.join(os.path.abspath(
         os.path.dirname(__file__)
-        ), 'sample_data.json')))
+    ), 'sample_data.json')))
 
-BASE_IMPORT_URL = 'http://{}:{}'.format(OPTIONS.eshost, OPTIONS.esport)
+schema = 'https://' if OPTIONS.usessl is not False else 'http://'
+BASE_IMPORT_URL = schema + '{}:{}'.format(OPTIONS.eshost, OPTIONS.esport)
 
 STRING = ("Starting import to server [{}] on port [{}] to index [{}]".format(
     OPTIONS.eshost, OPTIONS.esport, OPTIONS.kbindex))
@@ -84,8 +103,9 @@ def kb_import():
                 BASE_IMPORT_URL + '/' + OPTIONS.kbindex +
                 '/' + _type + '/' + _id,
                 data=json.dumps(_source),
-                headers={'content-type': 'application/json'}
-                )
+                headers={'content-type': 'application/json'},
+                auth=(OPTIONS.user, OPTIONS.passwd)
+            )
 
             check_response(response, 'import [' + _type + ']', _title)
 
@@ -99,17 +119,14 @@ def kb_default_index():
         response = requests.put(
             BASE_IMPORT_URL + '/' + OPTIONS.kbindex + '/config/5.6.2',
             data=json.dumps({'defaultIndex': 'cicd-perf'}),
-            headers={'content-type': 'application/json'}
-            )
+            headers={'content-type': 'application/json'},
+            auth=(OPTIONS.user, OPTIONS.passwd)
+        )
 
         check_response(response, 'default index', 'cicd-perf')
 
     except requests.exceptions.RequestException as err:
         print(err)
-
-    # $ curl -XPUT -D- 'http://localhost:9200/.kibana/config/5.6.1' \
-    #     -H 'Content-Type: application/json' \
-    #     -d '{"defaultIndex": "logstash-*"}'
 
 
 def es_template():
@@ -118,8 +135,9 @@ def es_template():
         response = requests.post(
             BASE_IMPORT_URL + '/_template/cicd-perf',
             data=json.dumps(TEMPLATE_JSON),
-            headers={'content-type': 'application/json'}
-            )
+            headers={'content-type': 'application/json'},
+            auth=(OPTIONS.user, OPTIONS.passwd)
+        )
 
         check_response(response, 'add template', 'cicd-perf')
 
@@ -137,8 +155,9 @@ def es_sample_data(index, data_type):
         response = requests.post(
             BASE_IMPORT_URL + '/' + index + '/' + doc_type + '/',
             data=json.dumps(PERF_JSON[data_type]),
-            headers={'content-type': 'application/json'}
-            )
+            headers={'content-type': 'application/json'},
+            auth=(OPTIONS.user, OPTIONS.passwd)
+        )
 
         check_response(response, 'add sample data', data_type)
 

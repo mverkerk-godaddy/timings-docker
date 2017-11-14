@@ -131,31 +131,36 @@ To add objects to Kibana, run the `timings-docker/elasticsearch/import/import.py
 
 The script resides in the `timings-docker/elasticsearch/import/` directory and accepts several arguments.
 
-Also, if elasticsearch is running on a remote server/cluster, you have to specify the full hostname and port using the `-f` or `--eshost` argument (and if the port is not 9200, use the `-g` or `--esport` argument).
+Also, if elasticsearch is running on a remote server/cluster, you have to specify the full hostname and port using the `--eshost` argument (and if the port is not 9200, use the `--esport` argument).
+
+The script also supports authentication to the elasticsearch server. Please use `--esuser` and `--espasswd` for Basic Auth.
 
 ```shell
-$ python elasticsearch/import/import.py --help
-usage: import.py [-h] [-a APIHOST] [-b APIPORT] [-f ESHOST] [-g ESPORT] [-i KBINDEX] [-k KBHOST] [-l KBPORT]
+$ python ./import/import.py --help
+usage: import.py [-h] [--apihost APIHOST] [--apiport APIPORT]
+                 [--esprotocol ESPROTOCOL] [--eshost ESHOST] [--esport ESPORT]
+                 [--esuser ESUSER] [--espasswd ESPASSWD]
+                 [--kbindex KBINDEX] [--kbhost KBHOST] [--kbport KBPORT]
+                 [--replace REPLACE]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -a APIHOST, --apihost APIHOST
-                        host/ip address of the timings server
+  --apihost APIHOST     host/ip address of the timings server
                         (default=localhost)
-  -b APIPORT, --apiport APIPORT
-                        host/ip address of the timings server (default=80)
-  -f ESHOST, --eshost ESHOST
-                        host/ip address of the elasticsearch server
+  --apiport APIPORT     host/ip address of the timings server (default=80)
+  --esprotocol ESPROTOCOL
+                        The scheme used by the elasticsearch server
+                        (default=http)
+  --eshost ESHOST       host/ip address of the elasticsearch server
                         (default=localhost)
-  -g ESPORT, --esport ESPORT
-                        port of the elasticsearch server (default=9200)
-  -i KBINDEX, --kbindex KBINDEX
-                        the kibana index (default=.kibana)
-  -k KBHOST, --kbhost KBHOST
-                        host/ip address of the kibana server
+  --esport ESPORT       port of the elasticsearch server (default=9200)
+  --esuser ESUSER       The username for elasticsearch Basic auth
+  --espasswd ESPASSWD   The password for elasticsearch Basic auth
+  --kbindex KBINDEX     the kibana index (default=.kibana)
+  --kbhost KBHOST       host/ip address of the kibana server
                         (default=localhost)
-  -l KBPORT, --kbport KBPORT
-                        port of the kibana server (default=5601)
+  --kbport KBPORT       port of the kibana server (default=5601)
+  --replace REPLACE     replace `TIMINGS` with this string
 ```
 
 #### Running the script from the docker host
@@ -163,7 +168,7 @@ optional arguments:
 To run from the host, you need to make sure that `Python` and the `requests` module are installed! The container already has them pre-installed. Run the following from the command line:
 
 ```shell
-$ python elasticsearch/import/import.py [-f ESHOST -g ESPORT ...]
+$ python elasticsearch/import/import.py [--eshost ESHOST --esport ESPORT ...]
 >>> You did not provide any or all of the arguments - defaults will be used!
 Starting import to server [localhost] on port [9200] to index [.kibana]
 =======================================================================
@@ -191,7 +196,7 @@ df10a60e2ef4        timingsdocker_kibana          "/bin/sh -c /usr/l..."   3 hou
 Use this ID to run the script with docker's `exec` command:
 
 ```shell
-$ docker exec -it 9836a8281d73 python ./import/import.py [-f ESHOST -g ESPORT ...]
+$ docker exec -it 9836a8281d73 python ./import/import.py [--eshost ESHOST --esport ESPORT ...]
 >>> You did not provide any or all of the arguments - defaults will be used!
 Starting import to server [localhost] on port [9200] to index [.kibana]
 =======================================================================
