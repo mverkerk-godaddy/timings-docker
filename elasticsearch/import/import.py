@@ -15,31 +15,31 @@ PARSER = argparse.ArgumentParser()
 # Common arguments
 PARSER.add_argument(
     '--apihost', action='store', default='localhost',
-    help='host/ip address of the timings server (default=localhost)')
+    help='full hostname or IP address of the timings server (default=localhost)')
 PARSER.add_argument(
     '--apiport', action='store', default='80',
-    help='host/ip address of the timings server (default=80)')
+    help='port of the timings server (default=80)')
 PARSER.add_argument(
     '--esprotocol', action='store', default='http',
-    help='The scheme used by the elasticsearch server (default=http)')
+    help='scheme used by the elasticsearch server (default=http)')
 PARSER.add_argument(
     '--eshost', action='store', default='localhost',
-    help='host/ip address of the elasticsearch server (default=localhost)')
+    help='full hostname or IP address of the elasticsearch server (default=localhost)')
 PARSER.add_argument(
     '--esport', action='store', default='9200',
     help='port of the elasticsearch server (default=9200)')
 PARSER.add_argument(
     '--esuser', action='store',
-    help='The username for elasticsearch Basic auth')
+    help='username for elasticsearch - if required')
 PARSER.add_argument(
     '--espasswd', action='store',
-    help='The password for elasticsearch Basic auth')
+    help='The password for elasticsearch - if required')
 PARSER.add_argument(
     '--kbindex', action='store', default='.kibana',
     help='the kibana index (default=.kibana)')
 PARSER.add_argument(
     '--kbhost', action='store', default='localhost',
-    help='host/ip address of the kibana server (default=localhost)')
+    help='full hostname or IP address of the kibana server (default=localhost)')
 PARSER.add_argument(
     '--kbport', action='store', default='5601',
     help='port of the kibana server (default=5601)')
@@ -72,10 +72,9 @@ PERF_JSON = json.load(
         os.path.dirname(__file__)
     ), 'sample_data.json')))
 
-schema = 'https://' if OPTIONS.usessl is not False else 'http://'
-BASE_IMPORT_URL = schema + '{}:{}'.format(OPTIONS.eshost, OPTIONS.esport)
+BASE_IMPORT_URL = '{0}://{1}:{2}'.format(OPTIONS.esprotocol, OPTIONS.eshost, OPTIONS.esport)
 
-STRING = ("Starting import to server [{}] on port [{}] to index [{}]".format(
+STRING = ("Starting import to server [{0}] on port [{1}] to index [{2}]".format(
     OPTIONS.eshost, OPTIONS.esport, OPTIONS.kbindex))
 print(STRING)
 print("=" * len(STRING))
@@ -104,7 +103,7 @@ def kb_import():
                 '/' + _type + '/' + _id,
                 data=json.dumps(_source),
                 headers={'content-type': 'application/json'},
-                auth=(OPTIONS.user, OPTIONS.passwd)
+                auth=(OPTIONS.esuser, OPTIONS.espasswd)
             )
 
             check_response(response, 'import [' + _type + ']', _title)
@@ -120,7 +119,7 @@ def kb_default_index():
             BASE_IMPORT_URL + '/' + OPTIONS.kbindex + '/config/5.6.2',
             data=json.dumps({'defaultIndex': 'cicd-perf'}),
             headers={'content-type': 'application/json'},
-            auth=(OPTIONS.user, OPTIONS.passwd)
+            auth=(OPTIONS.esuser, OPTIONS.espasswd)
         )
 
         check_response(response, 'default index', 'cicd-perf')
@@ -136,7 +135,7 @@ def es_template():
             BASE_IMPORT_URL + '/_template/cicd-perf',
             data=json.dumps(TEMPLATE_JSON),
             headers={'content-type': 'application/json'},
-            auth=(OPTIONS.user, OPTIONS.passwd)
+            auth=(OPTIONS.esuser, OPTIONS.espasswd)
         )
 
         check_response(response, 'add template', 'cicd-perf')
@@ -156,7 +155,7 @@ def es_sample_data(index, data_type):
             BASE_IMPORT_URL + '/' + index + '/' + doc_type + '/',
             data=json.dumps(PERF_JSON[data_type]),
             headers={'content-type': 'application/json'},
-            auth=(OPTIONS.user, OPTIONS.passwd)
+            auth=(OPTIONS.esuser, OPTIONS.espasswd)
         )
 
         check_response(response, 'add sample data', data_type)
@@ -167,11 +166,11 @@ def es_sample_data(index, data_type):
 
 def check_response(response, job, item):
     """Check the request responses and prints results"""
-    job_summ = " - job: {} - item: {}".format(job, item)
+    job_summ = " - job: {0} - item: {1}".format(job, item)
     if response.ok:
-        print("PASS - {}".format(job_summ))
+        print("PASS - {0}".format(job_summ))
     else:
-        print('FAIL - {} - StatusCode: {} - Reason: {}, Error: {}'.format(
+        print('FAIL - {0} - StatusCode: {1} - Reason: {2}, Error: {3}'.format(
             job_summ, response.status_code, response.reason, response.content))
 
 

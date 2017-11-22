@@ -125,15 +125,15 @@ After the containers have started, you can test the apps by browsing to the foll
 
 #### The import script
 
-<span style="color:red">**IMPORTANT:**</span> it is important that you **specify the full hostname of the API server** using the `-a` or `--apihost` argument! If you don't, the script will assume `localhost` and the waterfall links will not work for remote users!!
+<span style="color:red">**IMPORTANT:**</span> it is important that you **specify the full hostname of the API server** using the `--apihost` argument! If you don't, the script will assume `localhost` and the waterfall links will not work for remote users!!
 
 To add objects to Kibana, run the `timings-docker/elasticsearch/import/import.py` script. You can do this [from the docker host](#running-the-script-from-the-docker-host) or [from **inside** the elasticsearch container](#running-the-script-from-inside-the-elasticsearch-container)! This script will add dashboards, visualizations and index-patters for Kibana. It will even set the default index so you don't have to worry about a thing!
 
 The script resides in the `timings-docker/elasticsearch/import/` directory and accepts several arguments.
 
-Also, if elasticsearch is running on a remote server/cluster, you have to specify the full hostname and port using the `--eshost` argument (and if the port is not 9200, use the `--esport` argument).
+Also, if elasticsearch is running on a remote server/cluster, you have to specify the scheme, full hostname and port using the `--esprotocol`, `--eshost`, and `--esport` arguments!
 
-The script also supports authentication to the elasticsearch server. Please use `--esuser` and `--espasswd` for Basic Auth.
+The script also supports authentication to the elasticsearch server. Please use `--esuser` and `--espasswd` if required.
 
 ```shell
 $ python ./import/import.py --help
@@ -145,19 +145,19 @@ usage: import.py [-h] [--apihost APIHOST] [--apiport APIPORT]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --apihost APIHOST     host/ip address of the timings server
+  --apihost APIHOST     full hostname or IP address of the timings server
                         (default=localhost)
-  --apiport APIPORT     host/ip address of the timings server (default=80)
+  --apiport APIPORT     port of the timings server (default=80)
   --esprotocol ESPROTOCOL
-                        The scheme used by the elasticsearch server
+                        scheme used by the elasticsearch server
                         (default=http)
-  --eshost ESHOST       host/ip address of the elasticsearch server
+  --eshost ESHOST       full hostname or IP address of the elasticsearch server
                         (default=localhost)
   --esport ESPORT       port of the elasticsearch server (default=9200)
-  --esuser ESUSER       The username for elasticsearch Basic auth
-  --espasswd ESPASSWD   The password for elasticsearch Basic auth
+  --esuser ESUSER       username for elasticsearch - if needed
+  --espasswd ESPASSWD   password for elasticsearch - if needed
   --kbindex KBINDEX     the kibana index (default=.kibana)
-  --kbhost KBHOST       host/ip address of the kibana server
+  --kbhost KBHOST       full hostname or IP address of the kibana server
                         (default=localhost)
   --kbport KBPORT       port of the kibana server (default=5601)
   --replace REPLACE     replace `TIMINGS` with this string
