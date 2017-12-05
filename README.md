@@ -1,3 +1,14 @@
+# <span style="color:red;">**IMPORTANT NOTICE:**</span>  
+<span style="color:red;">**Recent updates to the API require a significant update to the elasticsearch/kibana setup. After updating this repo, you need to run `docker-compose` with the `--build` argument AND you need to re-run the `../elasticsearch/import/import.py` script!!**</span>
+
+Recommended command line for `import.py` (include all three **full** hostnames!):
+
+```shell
+$ python elasticsearch/import/import.py --apihost [APIHOST] --eshost [ELASTICSEARCH HOST] --kbhost [KIBANA HOST]
+```
+
+-- end of notice --
+
 # timings-docker
 
 Docker support for the node/express based **TIMINGS API**. See more here: [https://github.com/godaddy/timings](https://github.com/godaddy/timings).
@@ -172,9 +183,9 @@ $ python elasticsearch/import/import.py [--eshost ESHOST --esport ESPORT ...]
 >>> You did not provide any or all of the arguments - defaults will be used!
 Starting import to server [localhost] on port [9200] to index [.kibana]
 =======================================================================
-PASS -  - job: import [index-pattern] - item: cicd-perf-res
-PASS -  - job: import [index-pattern] - item: cicd-perf
-PASS -  - job: import [index-pattern] - item: cicd-perf-errorlog
+PASS -  - job: import [index-pattern] - item: cicd-resource*
+PASS -  - job: import [index-pattern] - item: cicd-perf*
+PASS -  - job: import [index-pattern] - item: cicd-errorlog*
 ...
 ...
 ```
@@ -200,9 +211,9 @@ $ docker exec -it 9836a8281d73 python ./import/import.py [--eshost ESHOST --espo
 >>> You did not provide any or all of the arguments - defaults will be used!
 Starting import to server [localhost] on port [9200] to index [.kibana]
 =======================================================================
-PASS -  - job: import [index-pattern] - item: cicd-perf-res
-PASS -  - job: import [index-pattern] - item: cicd-perf
-PASS -  - job: import [index-pattern] - item: cicd-perf-errorlog
+PASS -  - job: import [index-pattern] - item: cicd-resource*
+PASS -  - job: import [index-pattern] - item: cicd-perf*
+PASS -  - job: import [index-pattern] - item: cicd-errorlog*
 ...
 ...
 ```

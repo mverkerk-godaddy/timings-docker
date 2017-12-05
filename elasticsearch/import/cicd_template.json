@@ -1,6 +1,6 @@
 {
     "order": 0,
-    "template": "cicd-perf*",
+    "template": "cicd-*",
     "settings": {
         "number_of_shards": 1
     },
@@ -21,10 +21,9 @@
                 {
                     "timing_fields": {
                         "mapping": {
-                            "type": "long"
+                            "type": "float"
                         },
-                        "match_mapping_type": "*",
-                        "match": "*Time"
+                        "match_mapping_type": "long"
                     }
                 }
             ],
