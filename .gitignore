@@ -5,3 +5,5 @@
 /build
 
 /timings/logs
+/elasticsearch/logs
+/kibana/logs

@@ -27,8 +27,8 @@ services:
       - elasticsearch
 
   timings:
-    # image: timings:latest
-    build: timings/
+    image: mverkerk/timings:latest
+    # build: timings/
     container_name: timings
     volumes:
       - ./timings/config/.config.js:/src/.config.js
