@@ -1,5 +1,5 @@
-# <span style="color:red;">**IMPORTANT NOTICE:**</span>  
-<span style="color:red;">**Recent updates to the API require a significant update to the elasticsearch/kibana setup. After updating this repo, you need to run `docker-compose` with the `--build` argument AND you need to re-run the `../elasticsearch/import/import.py` script!!**</span>
+# **IMPORTANT NOTICE:**
+**Recent updates to the timings API require a significant changes to the elasticsearch/kibana setup. After updating this repo, you need to run `docker-compose` with the `--build` argument AND you need to re-run the `../elasticsearch/import/import.py` script!!**
 
 Recommended command line for `import.py` (include all three **full** hostnames!):
 
@@ -11,9 +11,9 @@ $ python elasticsearch/import/import.py --apihost [APIHOST] --eshost [ELASTICSEA
 
 # timings-docker
 
-Docker support for the node/express based **TIMINGS API**. See more here: [https://github.com/godaddy/timings](https://github.com/godaddy/timings).
+This repo provides **docker-compose** support for the node/express based [**TIMINGS API**](https://github.com/godaddy/timings) only! **This is not the API itself** but merely a collection of scripts and configuration files to run the API with Docker. For details about the API itself, please check out its repo here: [https://github.com/godaddy/timings](https://github.com/godaddy/timings).
 
-We **HIGHLY** recommend running the TIMINGS API along with ElasticSearch and Kibana in a containerized environment! This repo has everything you need to get this setup!
+Also, see the FAQ section in the Wiki for more help & tips: https://github.com/Verkurkie/timings-docker/wiki/FAQ-page.
 
 ## Installation
 
