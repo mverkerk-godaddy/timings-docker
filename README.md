@@ -8,9 +8,9 @@ If you don't specify your own config, the API will use the sample config: `./tim
 
 # timings-docker
 
-Docker support for the node/express based **TIMINGS API**. See more here: [https://github.com/godaddy/timings](https://github.com/godaddy/timings).
+This repo provides **docker-compose** support for the node/express based [**TIMINGS API**](https://github.com/godaddy/timings) only! **This is not the API itself** but merely a collection of scripts and configuration files to run the API with Docker. For details about the API itself, please check out its repo here: [https://github.com/godaddy/timings](https://github.com/godaddy/timings).
 
-We **HIGHLY** recommend running the TIMINGS API along with ElasticSearch and Kibana in a containerized environment! This repo has everything you need to get this setup!
+Also, see the FAQ section in the Wiki for more help & tips: https://github.com/Verkurkie/timings-docker/wiki/FAQ-page.
 
 ## Installation
 
