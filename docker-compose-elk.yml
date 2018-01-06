@@ -3,7 +3,7 @@ version: '2'
 services:
 
   elasticsearch:
-    build: elasticsearch/
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.2
     container_name: elasticsearch
     volumes:
       - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
@@ -16,7 +16,7 @@ services:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
 
   kibana:
-    build: kibana/
+    image: docker.elastic.co/kibana/kibana:5.6.2
     container_name: kibana
     volumes:
       - ./kibana/config:/usr/share/kibana/config

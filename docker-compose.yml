@@ -3,7 +3,8 @@ version: '2'
 services:
 
   elasticsearch:
-    build: elasticsearch/
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.2
+    # build: elasticsearch/
     container_name: elasticsearch
     volumes:
       - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
@@ -16,7 +17,8 @@ services:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
 
   kibana:
-    build: kibana/
+    image: docker.elastic.co/kibana/kibana:5.6.2
+    # build: kibana/
     container_name: kibana
     volumes:
       - ./kibana/config:/usr/share/kibana/config
@@ -27,18 +29,22 @@ services:
       - elasticsearch
 
   timings:
-    image: mverkerk/timings:latest
+    image: mverkerk/timings:1.1.4
     # build: timings/
     container_name: timings
     volumes:
-      - ./timings/config/.config.js:/src/.config.js
+      # - ./timings/config/.config.js:/src/.config.js
+      - ${CONFIGFILE}:/src/.config.js
       - ./timings/logs:/src/logs
       - ./timings/wait-for-it.sh:/src/wait-for-it.sh
     ports:
       - "80:80"
     environment:
       NODE_ENV: "production"
+      ES_HOST: "elasticsearch"
+      KB_HOST: "${HOSTNAME}"
+      DEBUG: "true"
     depends_on:
       - elasticsearch
       - kibana
-    command: ['./wait-for-it.sh', 'elasticsearch:9200', '-t', '30', '--strict', '--', 'node', './server.js', '-e', 'prod', '-f', 'elasticsearch', '-k', '${HOSTNAME}', '-d']
+    command: ['./wait-for-it.sh', 'elasticsearch:9200', '-t', '30', '--strict', '--', 'node', './server.js']

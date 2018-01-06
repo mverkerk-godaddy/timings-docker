@@ -1,11 +1,8 @@
-# <span style="color:red;">**IMPORTANT NOTICE:**</span>  
-<span style="color:red;">**Recent updates to the API require a significant update to the elasticsearch/kibana setup. After updating this repo, you need to run `docker-compose` with the `--build` argument AND you need to re-run the `../elasticsearch/import/import.py` script!!**</span>
+# **IMPORTANT NOTICE:**
 
-Recommended command line for `import.py` (include all three **full** hostnames!):
+You can specify the location of your own API config by using the `CONFIGFILE` environment variable!
 
-```shell
-$ python elasticsearch/import/import.py --apihost [APIHOST] --eshost [ELASTICSEARCH HOST] --kbhost [KIBANA HOST]
-```
+If you don't specify your own config, the API will use the sample config: `./timings/config/.config_sample.js`
 
 -- end of notice --
 
@@ -27,10 +24,6 @@ System requirements:
   - Windows Subsystem for Linux (Windows only)
     - To support the `wait-for-it.sh` script (until we have a PowerShell equivalent)
     - More info: https://msdn.microsoft.com/en-us/commandline/wsl/install-win10 and https://msdn.microsoft.com/commandline/wsl/install-on-server
-  - [Optional] Python and the `requests` module
-    - To support running the `import.py` script from the docker host (see [here](#running-the-script-from-the-docker-host))
-    - Python: http://docs.python-guide.org/en/latest/
-    - requests: http://docs.python-requests.org/en/master/user/install/
 - Min. 4GB memory for elasticsearch (8+GB is recommended)
 - Storage space for elasticsearch data
   - required amount amount depends on test frequency. As an indicator, running the API for ~6 mo at GoDaddy with ~40,000 tests/day produced ~170Gb of data.
@@ -86,14 +79,16 @@ $ sudo chmod 775 ./elasticsearch/data
 
 #### Configure the API for Kibana
 
-<span style="color:red">**IMPORTANT:**</span> Please configure the full hostname of the Kibana server in the API's config file with the `config.env.KB_HOST` setting. See review here [API config](https://github.com/godaddy/timings/blob/master/CONFIG.MD). Without this setting, the waterfall pages may not function properly!
+You can store your config file anywhere on the host system, just make sure you set `CONFIGFILE={path}` variable before the docker-compose command! The config file **must be in JavaScript format** (be sure to export the config with `module.exports`). A sample JS file is provided in this repo (`/timings/config/.config_sample.js`). 
+
+You do not have to specify `ES_HOST` and `KB_HOST` in the config file - they are configured in the `docker-compose.yml` file!
 
 ### Step 3. Starting up the API
 
-You should now be able to run the docker environment with the following command:
+You should now be able to run the docker environment with the following command (example):
 
 ```shell
-$ docker-compose up [--build]
+$ CONFIGFILE=/etc/.perfconfig.js docker-compose up [--build]
 Starting elasticsearch ...
 Starting elasticsearch ... done
 Starting kibana ...
@@ -128,111 +123,19 @@ After the containers have started, you can test the apps by browsing to the foll
 |ElasticSearch|http://your_server:9200|
 |Kibana|http://your_server:5601|
 
-### Step 5. Setup Kibana
-
-**IMPORTANT:** After startup, Kibana is completely empty - there are no dashboards, visualizations, default index, etc.:
-
-![Empty Kibana](/img/kb_before_import.jpg)
-
-#### The import script
-
-<span style="color:red">**IMPORTANT:**</span> it is important that you **specify the full hostname of the API server** using the `--apihost` argument! If you don't, the script will assume `localhost` and the waterfall links will not work for remote users!!
-
-To add objects to Kibana, run the `timings-docker/elasticsearch/import/import.py` script. You can do this [from the docker host](#running-the-script-from-the-docker-host) or [from **inside** the elasticsearch container](#running-the-script-from-inside-the-elasticsearch-container)! This script will add dashboards, visualizations and index-patters for Kibana. It will even set the default index so you don't have to worry about a thing!
-
-The script resides in the `timings-docker/elasticsearch/import/` directory and accepts several arguments.
-
-Also, if elasticsearch is running on a remote server/cluster, you have to specify the scheme, full hostname and port using the `--esprotocol`, `--eshost`, and `--esport` arguments!
-
-The script also supports authentication to the elasticsearch server. Please use `--esuser` and `--espasswd` if required.
-
-```shell
-$ python ./import/import.py --help
-usage: import.py [-h] [--apihost APIHOST] [--apiport APIPORT]
-                 [--esprotocol ESPROTOCOL] [--eshost ESHOST] [--esport ESPORT]
-                 [--esuser ESUSER] [--espasswd ESPASSWD]
-                 [--kbindex KBINDEX] [--kbhost KBHOST] [--kbport KBPORT]
-                 [--replace REPLACE]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --apihost APIHOST     full hostname or IP address of the timings server
-                        (default=localhost)
-  --apiport APIPORT     port of the timings server (default=80)
-  --esprotocol ESPROTOCOL
-                        scheme used by the elasticsearch server
-                        (default=http)
-  --eshost ESHOST       full hostname or IP address of the elasticsearch server
-                        (default=localhost)
-  --esport ESPORT       port of the elasticsearch server (default=9200)
-  --esuser ESUSER       username for elasticsearch - if needed
-  --espasswd ESPASSWD   password for elasticsearch - if needed
-  --kbindex KBINDEX     the kibana index (default=.kibana)
-  --kbhost KBHOST       full hostname or IP address of the kibana server
-                        (default=localhost)
-  --kbport KBPORT       port of the kibana server (default=5601)
-  --replace REPLACE     replace `TIMINGS` with this string
-```
-
-#### Running the script from the docker host
-
-To run from the host, you need to make sure that `Python` and the `requests` module are installed! The container already has them pre-installed. Run the following from the command line:
-
-```shell
-$ python elasticsearch/import/import.py [--eshost ESHOST --esport ESPORT ...]
->>> You did not provide any or all of the arguments - defaults will be used!
-Starting import to server [localhost] on port [9200] to index [.kibana]
-=======================================================================
-PASS -  - job: import [index-pattern] - item: cicd-resource*
-PASS -  - job: import [index-pattern] - item: cicd-perf*
-PASS -  - job: import [index-pattern] - item: cicd-errorlog*
-...
-...
-```
-
-Note that the script assumes [localhost] and [9200] when no arguments are provided!
-
-#### Running the script from inside the elasticsearch container
-
-You first need to get the elasticsearch container ID (in below example, the ID is: **9836a8281d73**):
-
-```shell
-$ docker ps
-CONTAINER ID        IMAGE                         COMMAND                  CREATED             STATUS              PORTS                                            NAMES
-adb19f15c820        timingsdocker_timings         "./wait-for-it.sh ..."   9 minutes ago       Up 9 minutes        0.0.0.0:80->80/tcp                               timings
-df10a60e2ef4        timingsdocker_kibana          "/bin/sh -c /usr/l..."   3 hours ago         Up 9 minutes        0.0.0.0:5601->5601/tcp                           kibana
-9836a8281d73        timingsdocker_elasticsearch   "/bin/bash bin/es-..."   3 hours ago         Up 9 minutes        0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   elasticsearch
-```
-
-Use this ID to run the script with docker's `exec` command:
-
-```shell
-$ docker exec -it 9836a8281d73 python ./import/import.py [--eshost ESHOST --esport ESPORT ...]
->>> You did not provide any or all of the arguments - defaults will be used!
-Starting import to server [localhost] on port [9200] to index [.kibana]
-=======================================================================
-PASS -  - job: import [index-pattern] - item: cicd-resource*
-PASS -  - job: import [index-pattern] - item: cicd-perf*
-PASS -  - job: import [index-pattern] - item: cicd-errorlog*
-...
-...
-```
-
-Note that the script uses [localhost] and [9200] when no arguments are provided!
-
-### Step 6. Validate Kibana objects
+### Step 5. Validate Kibana
 
 Now go and check out Kibana to make sure everything looks A-OK! Navigate to your Kibana server and go to:
 
 #### Management -> Saved Objects (should see a number of dashboards and visualizations)
 
-![Kibana Saved Objects - after import](/img/kb_saved_objects.jpg)
+![Kibana Saved Objects - after API startup & import](/img/kb_saved_objects.jpg)
 
 -or-
 
 #### Visualize (should see a list of visualizations)
 
-![Kibana Saved Objects - after import](/img/kb_visualizations.jpg)
+![Kibana Saved Objects - after API startup & import](/img/kb_visualizations.jpg)
 
 -or-
 
