@@ -77,14 +77,17 @@ $ sudo chown 1000:1000 ./elasticsearch/data
 $ sudo chmod 775 ./elasticsearch/data
 ```
 
-#### Configure the API for Kibana
-
-You can store your config file anywhere on the host system, just make sure you set `CONFIGFILE={path}` variable before the docker-compose command! The config file **must be in JavaScript format** (be sure to export the config with `module.exports`). A sample JS file is provided in this repo (`/timings/config/.config_sample.js`). 
-
-You do not have to specify `ES_HOST` and `KB_HOST` in the config file - they are configured in the `docker-compose.yml` file!
-
 ### Step 3. Starting up the API
 
+#### First, a note about the config file ...
+
+Make a copy of the sample config file `/timings/config/.config_sample.js` and store it somewhere on your system (in `/etc/` for example). Then, you can point at your config by setting the `CONFIGFILE` variable before the docker-compose command (see example below)!
+
+**If you don't use your own config file, the API will use the sample config file which will be overwritten the next time you run `git pull`!**
+
+You do not have to worry about `ES_HOST` and `KB_HOST` - they are already set in the `docker-compose.yml` file!
+
+#### Start it up!
 You should now be able to run the docker environment with the following command (example):
 
 ```shell
