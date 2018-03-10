@@ -5,7 +5,6 @@
 cluster.name: "docker-cluster"
 network.host: 0.0.0.0
 
-path.data: /var/lib/elasticsearch
 path.logs: /var/log/elasticsearch
 
 # minimum_master_nodes need to be explicitly set when bound on a public IP

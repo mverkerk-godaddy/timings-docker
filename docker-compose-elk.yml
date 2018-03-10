@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 services:
 
@@ -7,8 +7,8 @@ services:
     container_name: elasticsearch
     volumes:
       - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
       - ./elasticsearch/logs:/var/log/elasticsearch
-      - ./elasticsearch/data:/var/lib/elasticsearch
     ports:
       - "9200:9200"
       - "9300:9300"

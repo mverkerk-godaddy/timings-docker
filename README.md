@@ -1,14 +1,14 @@
 # **IMPORTANT NOTICE:**
 
-You can specify the location of your own API config by using the `CONFIGFILE` environment variable!
+If you want to edit the default config settings, you can make a copy of the sample config file (`./timings/config/.config_sample.js`) and save it as `./timings/config/.config.js` (file _**has**_ to be in this location!). Then, edit this new file according to your needs before starting the API!
 
-If you don't specify your own config, the API will use the sample config: `./timings/config/.config_sample.js`
+For info regarding the config file, see [https://github.com/godaddy/timings/blob/master/CONFIG.MD](https://github.com/godaddy/timings/blob/master/CONFIG.MD) 
 
 -- end of notice --
 
 # timings-docker
 
-This repo provides **docker-compose** support for the node/express based [**TIMINGS API**](https://github.com/godaddy/timings) only! **This is not the API itself** but merely a collection of scripts and configuration files to run the API with Docker. For details about the API itself, please check out its repo here: [https://github.com/godaddy/timings](https://github.com/godaddy/timings).
+This repo provides **docker-compose** support for the node/express based [**TIMINGS API**](https://github.com/godaddy/timings) only! **This is not the API itself** but merely a collection of scripts and configuration files to run the API in a docker based environment. For details about the API itself, please check out the repo here: [https://github.com/godaddy/timings](https://github.com/godaddy/timings).
 
 Also, see the FAQ section in the Wiki for more help & tips: https://github.com/Verkurkie/timings-docker/wiki/FAQ-page.
 
@@ -56,15 +56,15 @@ usermod -aG docker ${USER}
 
 #### Custom elasticsearch data directory
 
-This is optional. By defaults, the elasticsearch container will use the `timings-docker/elasticsearch/data` directory on the **docker host** to store its data. If you want to use a different location, you need to edit the `volumes` section of the `timings-docker/docker-compose.yml` file and point to the desired location.
+This is optional. By defaults, the elasticsearch container will use the `timings-docker/elasticsearch/data` directory on the **docker host** to store its data. If you want to use a different location, you need to edit the `volumes` section of the `timings-docker/docker-compose.yml` file and point to the desired location:
 
 ```yaml
   elasticsearch:
     ...
     volumes:
       - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/data:/usr/share/elasticsearch/data [ <<-- edit this line ]
       - ./elasticsearch/logs:/var/log/elasticsearch
-      - ./elasticsearch/data:/var/lib/elasticsearch
     ...
 ```
 
@@ -78,20 +78,10 @@ $ sudo chmod 775 ./elasticsearch/data
 ```
 
 ### Step 3. Starting up the API
-
-#### First, a note about the config file ...
-
-Make a copy of the sample config file `/timings/config/.config_sample.js` and store it somewhere on your system (in `/etc/` for example). Then, you can point at your config by setting the `CONFIGFILE` variable before the docker-compose command (see example below)!
-
-**If you don't use your own config file, the API will use the sample config file which will be overwritten the next time you run `git pull`!**
-
-You do not have to worry about `ES_HOST` and `KB_HOST` - they are already set in the `docker-compose.yml` file!
-
-#### Start it up!
 You should now be able to run the docker environment with the following command (example):
 
 ```shell
-$ CONFIGFILE=/etc/.perfconfig.js docker-compose up [--build]
+$ docker-compose up [--build]
 Starting elasticsearch ...
 Starting elasticsearch ... done
 Starting kibana ...
@@ -105,16 +95,6 @@ elasticsearch    | [2017-10-30T22:59:12,238][INFO ][o.e.n.Node               ] [
 ```
 
 **NOTE:** The first time you run this or when you use the `--build` argument, Docker will (re-)build the containers! The output will look different and the entire process will take longer to complete. You should use the `--build` argument every time one of the docker images is updated!
-
-Notice that the timings service first runs the `wait-for-it.sh` script. This ensures that the timings service waits (up to 30 secs) for elasticsearch to start!
-
-The following line in the output indicates that the timings service is up and running:
-
-```shell
-...
-timings          | debug: TIMINGS API [prod] is running on port 80
-...
-```
 
 ### Step 4. Test the apps
 

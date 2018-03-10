@@ -4,6 +4,9 @@
 # Build artifacts
 /build
 
+# runtime files
 /timings/logs
 /elasticsearch/logs
+/elasticsearch/data
 /kibana/logs
+/timings/config/.config.js

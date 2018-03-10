@@ -1,18 +1,4 @@
 const config = {
-  "env": {                          // Server-side settings
-    "ES_PROTOCOL": "http",            // Scheme used by the ElasticSearch server/cluster (default: "http")
-    "ES_HOST": "",                    // Hostname of the ElasticSearch server/cluster (default: "")
-    "ES_PORT": 9200,                  // Scheme used by the ElasticSearch server/cluster (default: 9200)
-    "ES_USER": "",                    // Username for Basic auth to ElasticSearch server/cluster (default: "")
-    "ES_PASS": "",                    // Password for Basic auth to ElasticSearch server/cluster (default: "")
-    "ES_SSL_CERT": "",                // Path to cert file for SSL auth to ElasticSearch server/cluster (default: "")
-    "ES_SSL_KEY": "",                 // Path to key file for SSL auth toElasticSearch server/cluster (default: "")
-    "KB_HOST": "",                    // Hostname of the Kibana server/cluster (default: -copy value from ES_HOST-)
-    "KB_PORT": 5601,                  // Scheme used by the ElasticSearch server/cluster (default: 5601)
-    "KB_INDEX": "",                   // Name of the main Kibana index in ElasticSearch (default: ".kibana") - used for upgrades
-    "HTTP_PORT": 80                   // Port of the API server (default: 80)
-  },
-  // API parameters
   "params": {                       // Client-side parameters
     "required": [                     // REQUIRED LOG parameters (have to start with 'log.')
       "log.test_info",                  // Information about the test-step
