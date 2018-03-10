@@ -30,7 +30,7 @@ services:
     image: godaddy/timings:latest
     container_name: timings
     volumes:
-      - ./timings/config/.config_sample.js:/src/.config.js
+      # - /your/custom/config.js:/src/.config.js
       - ./timings/logs:/src/logs
     ports:
       - "80:80"

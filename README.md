@@ -1,8 +1,18 @@
 # **IMPORTANT NOTICE:**
 
-If you want to edit the default config settings, you can make a copy of the sample config file (`./timings/config/.config_sample.js`) and save it as `./timings/config/.config.js` (file _**has**_ to be in this location!). Then, edit this new file according to your needs before starting the API!
+If you want to use custom config settings, you can make a copy of the sample config file (`./timings-docker/timings/config/.config_sample.js`) and:
 
-For info regarding the config file, see [https://github.com/godaddy/timings/blob/master/CONFIG.MD](https://github.com/godaddy/timings/blob/master/CONFIG.MD) 
+* save it in a location of your choice (example: `/etc/perfconfig.js`)
+* edit the file according to your needs - see also here: [https://github.com/godaddy/timings/blob/master/CONFIG.MD](https://github.com/godaddy/timings/blob/master/CONFIG.MD)
+* update `./timings-docker/docker-compose.yml` file and **uncomment** the _volume_ entry for the config file:
+
+```yaml
+  volumes
+  # - /your/custom/config.js:/src/.config.js  <<< uncomment & update this line!
+  - ./timings/logs:/src/logs
+```
+
+If you don't use a custom config file, the API will use default values. Settings such as the ElasticSearch host (`ES_HOST`), Kibana host (`KB_HOST`), etc. don't need to be included because they are already defined in the docker-compose yaml file.
 
 -- end of notice --
 
