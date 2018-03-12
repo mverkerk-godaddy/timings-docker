@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 services:
 
@@ -38,6 +38,7 @@ services:
       NODE_ENV: "production"
       ES_HOST: "elasticsearch"
       KB_HOST: "${HOSTNAME}"
+      API_HOST: "${HOSTNAME}"
       DEBUG: "true"
     depends_on:
       - elasticsearch
