@@ -2,20 +2,20 @@
 
 This repo provides **docker-compose** support for the node/express based [**TIMINGS API**](https://github.com/godaddy/timings) only! **This is not the API itself** but merely a collection of scripts and configuration files to run the API in a docker based environment. For details about the API itself, please check out the repo here: [https://github.com/godaddy/timings](https://github.com/godaddy/timings).
 
-Also, see the FAQ section in the Wiki for more help & tips: https://github.com/Verkurkie/timings-docker/wiki/FAQ-page.
+Also, see the FAQ section in the Wiki for more help & tips: [https://github.com/Verkurkie/timings-docker/wiki/FAQ-page](https://github.com/Verkurkie/timings-docker/wiki/FAQ-page).
 
 ## Installation
 
-### System requirements:
+### System requirements
 
 - Linux or Windows based OS with the following pre-requisites:
 
   - Docker and docker-compose
-    - Docker: https://docs.docker.com/engine/installation/
-    - Docker-compose: https://docs.docker.com/compose/install/
+    - Docker: [https://docs.docker.com/engine/installation/](https://docs.docker.com/engine/installation/)
+    - Docker-compose: [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
   - Windows Subsystem for Linux (Windows only)
     - To support the `wait-for-it.sh` script (until we have a PowerShell equivalent)
-    - More info: https://msdn.microsoft.com/en-us/commandline/wsl/install-win10 and https://msdn.microsoft.com/commandline/wsl/install-on-server
+    - More info: [https://msdn.microsoft.com/en-us/commandline/wsl/install-win10](https://msdn.microsoft.com/en-us/commandline/wsl/install-win10) and [https://msdn.microsoft.com/commandline/wsl/install-on-server](https://msdn.microsoft.com/commandline/wsl/install-on-server)
 - Min. 4GB memory for elasticsearch (8+GB is recommended)
 - Storage space for elasticsearch data
   - required amount amount depends on test frequency. As an indicator, running the API for ~6 mo at GoDaddy with ~40,000 tests/day produced ~170Gb of data.
@@ -40,7 +40,7 @@ It is recommended that you create a custom config file. You can copy the sample 
 
 - save it in a location of your choice (example: `/etc/perfconfig.js`)
 - edit the file according to your needs - see also here: [https://github.com/godaddy/timings/blob/master/CONFIG.MD](https://github.com/godaddy/timings/blob/master/CONFIG.MD)
-- update `./timings-docker/docker-compose.yml` file and **uncomment** the _volume_ entry for the config file:
+- update `./timings-docker/docker-compose.yml` file and **uncomment + edit** the _volumes_ section to map your config file to the container's `/src/.config.js` file:
 
 ```yaml
   volumes
@@ -82,13 +82,18 @@ You need to set the required permissions to the `elasticsearch/data` directory b
 
 ```shell
 $ sudo chown 1000:1000 ./elasticsearch/data
+$
 $ sudo chmod 775 ./elasticsearch/data
+$
 ```
 
 ### Step 4. Starting up the API
+
 You should now be able to run the environment by running `docker-compose up` from the `timings-docker` folder.
 
-**NOTE:** The first time you run this or when you use the `--build` argument, Docker will (re-)build the containers! The output will look different and the entire process will take a bit longer to complete. You should use the `--build` argument every time one of the docker images is updated!
+**NOTE:** The first time you install this or when you use the `pull / --build` argument(s), Docker will (re-)build the containers! The output will look different and the entire process will take a bit longer to complete.
+
+You should use `docker-compose pull && docker-compose up --build` every time one of the docker images is updated. This ensures you're getting the latest `timings` container!
 
 ```shell
 $ docker-compose up
