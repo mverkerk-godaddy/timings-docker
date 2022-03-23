@@ -1,0 +1,26 @@
+---
+## Default Kibana configuration from kibana-docker.
+## from https://github.com/elastic/kibana-docker/blob/master/build/kibana/config/kibana.yml
+#
+server.name: kibana
+server.host: "0"
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+logging.dest: /var/log/kibana/kibana.log
+logging.json: true
+logging.quiet: true
+logging.rotate:
+  enabled: true
+  everyBytes: 10485760
+  keepFiles: 10
+logging.rotate.enabled: true
+
+## Disable X-Pack
+## see https://www.elastic.co/guide/en/x-pack/current/xpack-settings.html
+##     https://www.elastic.co/guide/en/x-pack/current/installing-xpack.html#xpack-enabling
+#
+xpack.security.enabled: false
+xpack.monitoring.enabled: false
+xpack.ml.enabled: false
+xpack.graph.enabled: false
+xpack.reporting.enabled: false
+xpack.grokdebugger.enabled: false

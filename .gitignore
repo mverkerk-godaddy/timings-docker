@@ -1,12 +1,19 @@
 # editor artifacts
-.vscode
+.vscode/
+
+# backups
+.backup/
 
 # Build artifacts
 /build
 
 # runtime files
-/timings/logs
-/elasticsearch/logs
+/timings/logs/*.log
 /elasticsearch/data
-/kibana/logs
+/elasticsearch/logs/*.json
+/elasticsearch/logs/*.log
+/kibana/logs/*.log
 /timings/config/.config.js
+
+# elasticsearch data
+upgrade/data*/**/*
