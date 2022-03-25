@@ -49,7 +49,7 @@ services:
 
   timings:
     init: true
-    image: godaddy/timings:latest
+    image: godaddy/timings:2.0.1
     container_name: timings
     volumes:
       - "${CONFIGFILE}:/src/config/default.json"
