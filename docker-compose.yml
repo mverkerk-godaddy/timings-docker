@@ -6,6 +6,8 @@ services:
     init: true
     image: elasticsearch:7.17.0
     container_name: elasticsearch
+    logging:
+      driver: "none"
     volumes:
       - type: bind
         source: ./elasticsearch/data
@@ -29,6 +31,8 @@ services:
     init: true
     image: kibana:7.17.0
     container_name: kibana
+    logging:
+      driver: "none"
     volumes:
       - type: bind
         source: ./kibana/data
@@ -48,8 +52,8 @@ services:
     image: godaddy/timings:latest
     container_name: timings
     volumes:
-      - "${CONFIGFILE}:/src/config/default.js"
-      - ./timings/logs:/src/logs
+      - "${CONFIGFILE}:/src/config/default.json"
+      - ./timings/logs:/timings/logs
     ports:
       - "80:80"
     networks:
@@ -57,8 +61,8 @@ services:
     environment:
       NODE_ENV: "production"
       ES_HOST: "elasticsearch"
-      KB_HOST: "${HOSTNAME}"
-      API_HOST: "${HOSTNAME}"
+      KB_HOST: "kibana"
+      API_HOST: "$HOSTNAME"
       DEBUG: "true"
       IS_DOCKER: "true"
     depends_on:

@@ -4,14 +4,14 @@ This repo provides **docker-compose** support for the node/express based [**TIMI
 
 Also, see the FAQ section in the Wiki for more help & tips: [https://github.com/Verkurkie/timings-docker/wiki/FAQ-page](https://github.com/Verkurkie/timings-docker/wiki/FAQ-page).
 
-## IMPORTANT!
+## IMPORTANT
 
 **> IF YOU ARE UPDATING YOUR INSTALLATION OF THIS REPO, PLEASE READ THE [UPDATING.md](./docs/UPDATING.md) DOCUMENT!!**
 
 ## Usage
 
 Before jumping into the installation & usage of this repo and the associated Docker container, please read the following notes.
-It is really crucial that you understand Docker and `docker-compose`, especially before you upgrade this repo!!
+It is really crucial that you understand Docker and `docker-compose`, especially when upgrading this repo!!
 
 - When you start the Docker infrastructure for the first time, a number of folders is created for logs and data files:
 
@@ -25,27 +25,14 @@ It is really crucial that you understand Docker and `docker-compose`, especially
       /logs
   ```
 
-- As you use the API, elasticsearch data is stored on the local file system of the Docker Host! The data can be found in the `/elasticsearch/data/nodes/` folder
-- When you upgrade your installation of this repo, there is a possibility that the `docker-compose.yml` file is pointing at newer versions of Elasticsearch and Kibana
+- As you use the API, elasticsearch data is stored on the local file system of the Docker Host! The data can be found in the `./elasticsearch/data/nodes/` folder
+- When you upgrade this repo, there is a possibility that the `docker-compose.yml` file is pointing at newer versions of Elasticsearch and Kibana
   - ==>> in this scenario, please read the [UPDATING.md](./docs/UPDATING.md) document!
   - **please make sure that you have migrated your elasticsearch data when upgrading to a new MAJOR version of elasticsearch/kibana!**
 
-### System requirements
+Last but not least, please reference the [system requirements](#system-requirements) to check if your system meets the needs.
 
-- Linux or Windows based OS with the following pre-requisites:
-
-  - Docker and docker-compose
-    - Docker: [https://docs.docker.com/engine/installation/](https://docs.docker.com/engine/installation/)
-    - Docker-compose: [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
-  - Windows Subsystem for Linux (Windows only)
-    - To support the `wait-for-it.sh` script (until we have a PowerShell equivalent)
-    - More info: [https://msdn.microsoft.com/en-us/commandline/wsl/install-win10](https://msdn.microsoft.com/en-us/commandline/wsl/install-win10) and [https://msdn.microsoft.com/commandline/wsl/install-on-server](https://msdn.microsoft.com/commandline/wsl/install-on-server)
-- Min. 4GB memory for elasticsearch (8+GB is recommended)
-- Storage space for elasticsearch data
-  - required amount depends on test frequency. As an indicator, running the API for ~6 mo at GoDaddy with ~40,000 tests/day produced ~170Gb of data.
-  - storage can also be mounted remotely (see [here](#custom-elasticSearch-data-directory-optional))
-
-### Step 1. Clone this repo
+### Step 1. Clone it
 
 Clone this repo to a folder of your choice:
 
@@ -53,75 +40,22 @@ Clone this repo to a folder of your choice:
 $ git clone git@github.com/godaddy/timings-docker.git
 Cloning into 'timings-docker'...
 ...
-...
-
 $ cd timings-docker
 ```
 
-### Step 2. Create a custom config file
+### Step 2. Configure it
 
-It is recommended that you create a custom config file. You can copy the sample config file (`./timings-docker/timings/config/.config_sample.js`) and:
+It is recommended that you create a custom config file. You can copy the sample config file (`./timings-docker/timings/config/sample_default.json`) and:
 
-- save it in a location of your choice (example: `/etc/perfconfig.js`)
+- save it in a location of your choice (example: `/etc/timings/timings.json`)
 - edit the file according to your needs - see also here: [https://github.com/godaddy/timings/blob/master/CONFIG.MD](https://github.com/godaddy/timings/blob/master/CONFIG.MD)
-- update `./timings-docker/docker-compose.yml` file and **uncomment + edit** the _volumes_ section to map your config file to the container's `/src/.config.js` file
 
-For example:
+### Step 3. Run it
 
-```yaml
-  volumes
-  - /your/custom/config.js:/src/.config.js  <<< uncomment & update this line!
-  - ./timings/logs:/src/logs
-```
-
-**If you don't use a custom config file, the API will use default values**. Settings such as the ElasticSearch host (`ES_HOST`), Kibana host (`KB_HOST`), etc. don't need to be included because they are already defined in the docker-compose yaml file.
-
-### Step 3. Prepping the docker host
-
-Before you can run the API you may have to make a few modifications to your docker host:
-
-#### Add user to `docker` group [Linux only]
-
-You have to add your user account to the `docker` group and logging out & back in again. If you don't do this, you have to run `docker-compose` with `sudo` which is not recommended! You can use the following command:
+You should now be able to run the environment by running:
 
 ```lang-console
-sudo usermod -aG docker ${USER}
-```
-
-#### Custom elasticsearch data directory
-
-This is optional. By defaults, the elasticsearch container will use the `timings-docker/elasticsearch/data` directory on the **docker host** to store its data. If you want to use a different location, you need to edit the `volumes` section of the `timings-docker/docker-compose.yml` file and point to the desired location:
-
-```yaml
-  elasticsearch:
-    ...
-    volumes:
-      - ./elasticsearch/data:/usr/share/elasticsearch/data [ <<-- edit this line ]
-    ...
-```
-
-#### Set permissions for the data & logging directories [Linux only]
-
-You need to set the necessary read/write permissions to the data and logging directories! Depending on how you are running docker-compose, the permissions may look different
-
-In this example, we're setting full permissions on all of the directories:
-
-```lang-console
-$ sudo chmod 777 ./elasticsearch/data
-$ sudo chmod 777 ./kibana/data
-$ sudo chmod 777 ./timings/logs
-```
-
-### Step 4. Starting up the API
-
-You should now be able to run the environment by running `docker-compose up` from the `timings-docker` folder.
-
-**NOTE:** The first time you install this or when you use the `pull / --build` argument(s), Docker will (re-)build the containers! The output will look different and the entire process will take a bit longer to complete.
-
-You should use `docker-compose pull && docker-compose up --build` every time one of the docker images is updated. This ensures you're getting the latest `timings` container!
-
-```lang-console
-$ docker-compose up
+$ CONFIGFILE=/etc/timings/timings.json docker-compose up
 WARNING: The HOSTNAME variable is not set. Defaulting to a blank string.
 Starting elasticsearch ... done
 Starting kibana        ... done
@@ -143,43 +77,90 @@ timings          | [2021-03-01T09:34:04.426Z][info] - Elasticsearch - UTILS - [U
 
 Above example is showing the main log output messages of the [timings] service that you should look for! During the first startup, you should ultimately see a line that says `[UPDATE] API and ELK are up-to-date!` or `[TEMPLATE] created/updated [cicd-perf]` in case the API was updated! This confirms that the API waited for Elasticsearch to be healthy and it updated the template for `cicd-perf*` in Elasticsearch.
 
-### Step 5. Test the apps
+```bash
+$ CONFIGFILE=/etc/timings/timings.json docker-compose up
+```
 
-After the containers have started, you can test the apps by browsing to the following:
+**NOTE:** The first time you install this or when you use the `pull / --build` argument(s), Docker will (re-)build the containers! The output will look different and the entire process will take a bit longer to complete.
 
-|App|Link|
+You should use `CONFIGFILE=/etc/timings/timings.json docker-compose pull && docker-compose up --build` every time the timings images is updated. This ensures you're getting the latest container!
+
+### Step 4. Check it
+
+After the containers have started, you can test the app by browsing to the following URLs (where `hostname` is the name of you Docker host system):
+
+|Service|Link|
 |-|-|
-|timings|http://your_server
-|elasticsearch|http://your_server:9200|
-|kibana|http://your_server:5601|
+|timings|http://hostname
+|elasticsearch|http://hostname:9200|
+|kibana|http://hostname:5601|
 
-### Step 6. Kibana Saved objects
+## Other considerations
 
-On first-time installation, the timings API should automatically import a basic set of Kibana objects.
+Depending on your host system, you may need to make some further adjustments or you can consider a few optional settings. Keep reading below.
 
+### Update docker-compose file [optional]
 
-Just in case the import didn't work or you're doing a a manual install, you can import the set manually by following this procedure:
+Instead of using the `CONFIGFILE` variable to start docker-compose, you can reference your config file in the `docker-compose.yml` file:
 
-- Navigate to your Kibana server and go to menu -> Stack Management:
+- Update `./timings-docker/docker-compose.yml` and **uncomment + edit** the _volumes_ section for the `timings` service to map your config file to the container's `/src/config/default.json` file:
 
-  ![Kibana - Stack Management](/docs/img/kb_menu_stack_management.jpg)
+```yaml
+  volumes
+  volumes:
+    - "${CONFIGFILE}:/src/config/default.json"   <<-- edit this line
+    - ./timings/logs:/timings/logs
+```
 
-- Choose the "Saved Objects" option:
+**If you don't use a custom config file, the API will use default values**. Settings such as the ElasticSearch host (`ES_HOST`), Kibana host (`KB_HOST`), etc. don't need to be included because they are already defined in the docker-compose yaml file.
 
-  ![Kibana - Saved Objects](/docs/img/kb_saved_objects_empty.jpg)
+### Host specific settings
 
-- Click on "import" and select the `.kibana_items.json` file from this repo:
+Before you can run the API you may have to make a few modifications to your docker host:
 
-  ![Kibana - Import](/docs/img/kb_saved_objects_import.jpg)
+#### Add user to `docker` group [Linux only]
 
-- Yu will see some messages about JSON going away, but those can be ignored. Click on the "import" button to import the file. After successful import, you should see the list of saved objects
+You have to add your user account to the `docker` group and logging out & back in again. If you don't do this, you have to run `docker-compose` with `sudo` which is not recommended! You can use the following command:
 
-  ![Kibana - Import](/docs/img/kb_saved_objects_list.jpg)
+```lang-console
+sudo usermod -aG docker ${USER}
+```
 
-#### TIMINGS-Dashboard (should see an empty dashboard)
+#### Custom elasticsearch data directory [optional]
 
-Since you most probably haven't submitted any test results to the API yet, the main dashboard (http://{kibana host}/app/kibana#/dashboard/TIMINGS-Dashboard) is working but still empty:
+This is optional. By defaults, the elasticsearch container will use the `timings-docker/elasticsearch/data` directory on the **docker host** to store its data. If you want to use a different location, you can edit the `volumes` section of the `timings-docker/docker-compose.yml` file and point to the desired location:
 
-![Kibana empty Dashboard](/docs/img/kb_dashboard.jpg)
+```yaml
+  elasticsearch:
+    ...
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data    <<-- edit this line
+    ...
+```
 
-Time to start running your tests and submit data to the API and your dashboard should start showing some data!
+#### Set permissions for the data & logging directories [Linux only]
+
+You need to set the necessary read/write permissions to the data and logging directories! Depending on how you are running docker-compose, the permissions may look different
+
+In this example, we're setting full permissions on all of the directories:
+
+```lang-console
+$ sudo chmod 777 ./elasticsearch/data
+$ sudo chmod 777 ./kibana/data
+$ sudo chmod 777 ./timings/logs
+```
+
+## System requirements
+
+- Linux or Windows based OS with the following pre-requisites:
+
+  - Docker and docker-compose
+    - Docker: [https://docs.docker.com/engine/installation/](https://docs.docker.com/engine/installation/)
+    - Docker-compose: [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
+  - Windows Subsystem for Linux (Windows only)
+    - To support the `wait-for-it.sh` script (until we have a PowerShell equivalent)
+    - More info: [https://msdn.microsoft.com/en-us/commandline/wsl/install-win10](https://msdn.microsoft.com/en-us/commandline/wsl/install-win10) and [https://msdn.microsoft.com/commandline/wsl/install-on-server](https://msdn.microsoft.com/commandline/wsl/install-on-server)
+- Min. 4GB memory for elasticsearch (8+GB is recommended)
+- Storage space for elasticsearch data
+  - required amount depends on test frequency. As an indicator, running the API for ~6 mo at GoDaddy with ~40,000 tests/day produced ~170Gb of data.
+  - storage can also be mounted remotely (see [here](#custom-elasticSearch-data-directory-optional))
