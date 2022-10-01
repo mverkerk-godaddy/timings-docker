@@ -49,13 +49,14 @@ services:
 
   timings:
     init: true
-    image: godaddy/timings:2.0.1
+    # image: godaddy/timings:2.0.2
+    image: godaddy/timings:2.0.3
     container_name: timings
     volumes:
       - "${CONFIGFILE}:/src/config/default.json"
       - ./timings/logs:/timings/logs
     ports:
-      - "80:80"
+      - "8080:8080"
     networks:
       - elastic-stack
     environment:
